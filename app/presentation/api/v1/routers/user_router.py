@@ -23,14 +23,26 @@ user_router = APIRouter(prefix="/user", tags=["user"])
 
 
 def set_refresh_token_to_cookie(response: Response, refresh_token: str):
+    age_30days = 60 * 60 * 24 * 30
+
     response.set_cookie(
         key="refreshToken",
         value=refresh_token,
         httponly=True,
         secure=False,
-        samesite="lax",
-        max_age=60 * 60 * 24 * 7,
+        samesite="strict",
+        max_age=age_30days,
         path="/user/refresh",
+    )
+
+    response.set_cookie(
+        key="hasToken",
+        value="true",
+        httponly=True,
+        secure=False,
+        samesite="strict",
+        max_age=age_30days,
+        path="/",
     )
 
 
@@ -39,8 +51,16 @@ def delete_refresh_token_from_cookie(response: Response):
         key="refreshToken",
         httponly=True,
         secure=False,
-        samesite="lax",
+        samesite="strict",
         path="/user/refresh",
+    )
+
+    response.delete_cookie(
+        key="hasToken",
+        httponly=True,
+        secure=False,
+        samesite="strict",
+        path="/",
     )
 
 
