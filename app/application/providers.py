@@ -12,8 +12,8 @@ from application.services import (
 )
 from infrastructure.websocket import WebSocketManager
 from application.ws_message_handlers import (
-    GameWebSocketMessageHandler,
-    LobbyWebSockeMessageHandler,
+    GameWSMessageHandler,
+    LobbyWSMessageHandler,
 )
 from infrastructure.redis.repositories import GameRepository, LobbyRepository
 from infrastructure.database.repositories import UserRepository
@@ -67,10 +67,8 @@ class ApplicationProvider(Provider):
         game_service: GameService,
         game_manager: GameManagerService,
         websocket_manager: WebSocketManager,
-    ) -> GameWebSocketMessageHandler:
-        return GameWebSocketMessageHandler(
-            game_service, game_manager, websocket_manager
-        )
+    ) -> GameWSMessageHandler:
+        return GameWSMessageHandler(game_service, game_manager, websocket_manager)
 
     @provide(scope=Scope.REQUEST)
     def lobby_ws_handler(
@@ -79,8 +77,8 @@ class ApplicationProvider(Provider):
         lobby_service: LobbyService,
         game_manager: GameManagerService,
         websocket_manager: WebSocketManager,
-    ) -> LobbyWebSockeMessageHandler:
-        return LobbyWebSockeMessageHandler(
+    ) -> LobbyWSMessageHandler:
+        return LobbyWSMessageHandler(
             game_service,
             lobby_service,
             game_manager,
@@ -92,13 +90,15 @@ class ApplicationProvider(Provider):
     def room_ws_service(
         self,
         websocket_manager: WebSocketManager,
-        game_ws_handler: GameWebSocketMessageHandler,
-        lobby_ws_handler: LobbyWebSockeMessageHandler,
+        game_ws_handler: GameWSMessageHandler,
+        lobby_ws_handler: LobbyWSMessageHandler,
         user_service: UserService,
+        lobby_service: LobbyService,
     ) -> RoomWebSocketService:
         return RoomWebSocketService(
             websocket_manager,
             game_ws_handler,
             lobby_ws_handler,
             user_service,
+            lobby_service,
         )

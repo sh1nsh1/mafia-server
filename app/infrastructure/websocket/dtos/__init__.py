@@ -1,26 +1,26 @@
 from .websocket_message import WebSocketMessage
-from .websocket_game_data_payload import WebSocketGameDataPayload
-from .websocket_game_info_payload import WebSocketGameInfoPayload
-from .websocket_game_role_payload import WebSocketGameRolePayload
-from .websocket_lobby_data_payload import WebSocketLobbyDataPayload
-from .websocket_game_command_payload import WebSocketGameCommandPayload
-from .websocket_lobby_command_payload import WebSocketLobbyCommandPayload
-from .websocket_game_new_stage_payload import WebSocketGameNewStagePayload
-from .websocket_game_action_request_payload import WebSocketGameActionRequestPayload
-from .websocket_user_connection_message_payload import (
-    WebSocketUserConnectionMessagePayload,
+from .ws_game_data_payload import WSGameDataPayload
+from .ws_game_info_payload import WSGameInfoPayload
+from .ws_game_role_payload import WSGameRolePayload
+from .ws_lobby_data_payload import WSLobbyDataPayload
+from .ws_game_command_payload import WSGameCommandPayload
+from .ws_lobby_command_payload import WSLobbyCommandPayload
+from .ws_game_new_stage_payload import WSGameNewStagePayload
+from .ws_game_action_request_payload import WSGameActionRequestPayload
+from .ws_user_connection_message_payload import (
+    WSUserConnectionMessagePayload,
 )
 
 
 __all__ = [
-    "WebSocketGameActionRequestPayload",
-    "WebSocketGameCommandPayload",
-    "WebSocketGameDataPayload",
-    "WebSocketGameInfoPayload",
-    "WebSocketGameNewStagePayload",
-    "WebSocketGameRolePayload",
-    "WebSocketLobbyCommandPayload",
-    "WebSocketLobbyDataPayload",
+    "WSGameActionRequestPayload",
+    "WSGameCommandPayload",
+    "WSGameDataPayload",
+    "WSGameInfoPayload",
+    "WSGameNewStagePayload",
+    "WSGameRolePayload",
+    "WSLobbyCommandPayload",
+    "WSLobbyDataPayload",
     "WebSocketMessage",
-    "WebSocketUserConnectionMessagePayload",
+    "WSUserConnectionMessagePayload",
 ]

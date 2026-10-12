@@ -10,7 +10,7 @@ from infrastructure.factories import DBSessionFactory
 from infrastructure.database.models.user_model import UserModel
 
 
-logger = get_logger(f"{__name__}.UserRepository", 10)
+logger = get_logger(f"{__name__}.UserRepository", 20)
 
 
 class UserRepository:

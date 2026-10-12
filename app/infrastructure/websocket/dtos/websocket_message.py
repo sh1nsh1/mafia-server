@@ -1,31 +1,19 @@
 from domain.enums import WebSocketTopicEnum, WebSocketMessageTypeEnum
+from infrastructure.websocket.dtos.ws_game_data_payload import WSGameDataPayload
+from infrastructure.websocket.dtos.ws_game_info_payload import WSGameInfoPayload
+from infrastructure.websocket.dtos.ws_game_role_payload import WSGameRolePayload
+from infrastructure.websocket.dtos.ws_lobby_data_payload import WSLobbyDataPayload
 from infrastructure.websocket.dtos.base_websocket_message import BaseWebSocketMessage
-from infrastructure.websocket.dtos.websocket_game_data_payload import (
-    WebSocketGameDataPayload,
+from infrastructure.websocket.dtos.ws_game_command_payload import WSGameCommandPayload
+from infrastructure.websocket.dtos.ws_lobby_command_payload import WSLobbyCommandPayload
+from infrastructure.websocket.dtos.ws_game_new_stage_payload import (
+    WSGameNewStagePayload,
 )
-from infrastructure.websocket.dtos.websocket_game_info_payload import (
-    WebSocketGameInfoPayload,
+from infrastructure.websocket.dtos.ws_game_action_request_payload import (
+    WSGameActionRequestPayload,
 )
-from infrastructure.websocket.dtos.websocket_game_role_payload import (
-    WebSocketGameRolePayload,
-)
-from infrastructure.websocket.dtos.websocket_lobby_data_payload import (
-    WebSocketLobbyDataPayload,
-)
-from infrastructure.websocket.dtos.websocket_game_command_payload import (
-    WebSocketGameCommandPayload,
-)
-from infrastructure.websocket.dtos.websocket_lobby_command_payload import (
-    WebSocketLobbyCommandPayload,
-)
-from infrastructure.websocket.dtos.websocket_game_new_stage_payload import (
-    WebSocketGameNewStagePayload,
-)
-from infrastructure.websocket.dtos.websocket_game_action_request_payload import (
-    WebSocketGameActionRequestPayload,
-)
-from infrastructure.websocket.dtos.websocket_user_connection_message_payload import (
-    WebSocketUserConnectionMessagePayload,
+from infrastructure.websocket.dtos.ws_user_connection_message_payload import (
+    WSUserConnectionMessagePayload,
 )
 
 
@@ -36,7 +24,6 @@ class WebSocketMessage(BaseWebSocketMessage):
     timestamp
     payload: {
         "action_type": "role_action" | "vote",
-        "actor": "<player_user_id>",
         "actor_role": RoleEnum
         "target": "<player_user_id>"
         "room_id": "<room_id>
@@ -47,13 +34,13 @@ class WebSocketMessage(BaseWebSocketMessage):
     topic: WebSocketTopicEnum
     timestamp: str
     payload: (
-        WebSocketGameCommandPayload  # COMAND
-        | WebSocketGameInfoPayload  # INFO | ERROR
-        | WebSocketGameActionRequestPayload  # ACTION_REQUEST
-        | WebSocketGameNewStagePayload  # NEW_STAGE
-        | WebSocketGameDataPayload  # GAME_DATA
-        | WebSocketLobbyDataPayload  # LOBBY_DATA
-        | WebSocketLobbyCommandPayload  # COMAND
-        | WebSocketUserConnectionMessagePayload  # USER_CONNECT | USER_CONNECT
-        | WebSocketGameRolePayload
+        WSGameCommandPayload  # COMAND
+        | WSGameInfoPayload  # INFO | ERROR
+        | WSGameActionRequestPayload  # ACTION_REQUEST
+        | WSGameNewStagePayload  # NEW_STAGE
+        | WSGameDataPayload  # GAME_DATA
+        | WSLobbyDataPayload  # LOBBY_DATA
+        | WSLobbyCommandPayload  # COMAND
+        | WSUserConnectionMessagePayload  # USER_CONNECT | USER_CONNECT
+        | WSGameRolePayload
     )

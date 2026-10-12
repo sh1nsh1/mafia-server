@@ -2,92 +2,51 @@ import json
 import time
 from contextlib import ExitStack
 
-import pytest
-from fastapi.testclient import TestClient
-
-from main import app
 from domain.enums import WebSocketMessageTypeEnum
 
 
-players = []
-test_data = {"players": players}
+def test_login(players):
+    assert len(players) == 5
+    assert all(player["access_token"] for player in players)
+    assert all(player["refresh_token"] for player in players)
 
 
-@pytest.fixture(scope="session")
-def client():
-    with TestClient(app, base_url="http://localhost:8000") as client:
-        yield client
-
-
-@pytest.fixture
-def lobby(client: TestClient):
+def test_create_and_join_lobby(client, redis_client, players):
+    admin_token = players[0]["access_token"]
     response = client.post(
         "lobbies/",
         json={"max_players": 5},
-        headers={
-            "authorization": f"Bearer {test_data['players'][0]['access_token']}"
-        },
+        headers={"authorization": f"Bearer {admin_token}"},
     )
-    yield response.json()
-    response = client.post(
-        f"lobbies/{response.json()['id']}/leave",
-        headers={
-            "authorization": f"Bearer {test_data['players'][0]['access_token']}"
-        },
-    )
-
-
-def test_login(client: TestClient):
-    for i in range(5):
-        response = client.post(
-            "user/login/",
-            data={"username": f"User{i + 1}", "password": f"Userpwd{i + 1}"},
-        )
-        assert response.status_code == 200
-
-        test_data["players"].append(
-            {
-                "access_token": response.json()["accessToken"],
-                "refresh_token": response.cookies["refreshToken"],
-            }
-        )
-
-
-def test_create_lobby(client: TestClient, lobby: dict[str, any]):
-    assert lobby is not None
-
-
-def test_join_lobby(client: TestClient, lobby: dict[str, any]):
-    for i in range(1, 5):
-        response = client.post(
-            f"lobbies/{lobby['id']}/join",
-            headers={
-                "authorization": f"Bearer {
-                    test_data['players'][i]['access_token']
-                }"
-            },
-        )
-        assert response.status_code == 200
+    assert response.status_code == 200, response.text
+    lobby_id = response.json()["id"]
 
     with ExitStack() as stack:
-        joined_players = []
+        sessions = []
         for i in range(5):
-            headers = {
-                "authorization": f"Bearer {
-                    test_data['players'][i]['access_token']
-                }"
-            }
-            ws = stack.enter_context(
+            session = stack.enter_context(
                 client.websocket_connect(
-                    f"rooms/{lobby['id']}",
-                    headers=headers,
+                    f"rooms/{lobby_id}",
+                    headers={"authorization": f"Bearer {players[i]['access_token']}"},
                 )
             )
-            joined_players.append(ws)
-            time.sleep(0.01)
-            for j in range(len(joined_players)):
-                response = json.loads(joined_players[j].receive_json())
-                assert (
-                    response["messageType"]
-                    == WebSocketMessageTypeEnum.USER_CONNECT
-                )
+            sessions.append(session)
+            time.sleep(0.02)
+            for existing in sessions:
+                message = json.loads(existing.receive_json())
+                assert message["messageType"] == WebSocketMessageTypeEnum.USER_CONNECT
+
+        for i in range(len(sessions) - 1, -1, -1):
+            sessions[i].close()
+            for j in range(i):
+                message = json.loads(sessions[j].receive_json())
+                assert message["messageType"] == WebSocketMessageTypeEnum.USER_LEAVE
+
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline and redis_client.exists(f"lobby:{lobby_id}"):
+            time.sleep(0.1)
+
+        assert not redis_client.exists(f"lobby:{lobby_id}"), (
+            "лобби не удалено после выхода всех, включая создателя"
+        )
+        assert redis_client.hlen("active_users") == 0, "active_users не очищен"

@@ -14,7 +14,7 @@ from presentation.api.v1.dtos.responses import TokenPair, UserCreateResponse
 from infrastructure.database.repositories import UserRepository
 
 
-logger = get_logger(f"{__name__}.SecurityService", 10)
+logger = get_logger(f"{__name__}.SecurityService", 20)
 
 
 class SecurityService:

@@ -150,6 +150,14 @@ class LobbyRepository:
         logger.debug("add_participant")
         # Проверяем, не активен ли пользователь в каком-то лобби
         if active_lobby_id := await self._get_user_active_lobby_id(user_id):
+            # уже активен в этом же лобби
+            if str(active_lobby_id) == str(lobby_id):
+                existing_lobby = await self.get_lobby_by_id(lobby_id)
+                if existing_lobby:
+                    logger.debug(
+                        f"user {user_id} already in lobby {lobby_id} -> reconnect"
+                    )
+                    return existing_lobby
             raise UserAlredyInLobbyException(
                 f"User {user_id} is already active in lobby {active_lobby_id}",
                 context_id=lobby_id,
@@ -250,10 +258,12 @@ class LobbyRepository:
         logger.debug("remove_participant")
         lobby_model = await self._get_lobby_model_by_id(lobby_id)
         if not lobby_model:
+            logger.warning("RoomNotFoundException")
             raise RoomNotFoundException(context_id=lobby_id)
 
         active_lobby_id = await self._get_user_active_lobby_id(user_id)
         if not active_lobby_id:
+            logger.warning("UserNotInLobbyException")
             raise UserNotInLobbyException(None, lobby_id, str(user_id))
 
         # Если удаляем админа - удаляем и само лобби
@@ -287,6 +297,7 @@ class LobbyRepository:
         lobby_model = await self._get_lobby_model_by_id(lobby_id)
 
         if not lobby_model:
+            logger.warning("RoomNotFoundException")
             raise RoomNotFoundException(context_id=lobby_id)
 
         active_user_ids = list(

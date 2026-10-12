@@ -11,7 +11,7 @@ from application.services import SecurityService, RoomWebSocketService
 from infrastructure.logger import get_logger
 from infrastructure.websocket.dtos import (
     WebSocketMessage,
-    WebSocketGameInfoPayload,
+    WSGameInfoPayload,
 )
 
 
@@ -27,44 +27,54 @@ async def room_websocket(
     logger.debug("room_websocket")
     token = websocket.headers.get("authorization", "").removeprefix("Bearer ")
 
-    async with container() as request_container:
-        security_service = await request_container.get(SecurityService)
-        current_user = await security_service.get_current_user(token)
-        room_websocket_service = await request_container.get(
-            RoomWebSocketService
-        )
-        await room_websocket_service.subscribe_room_webscoket(
-            room_id, current_user, websocket
-        )
+    current_user = None
+    subscribed = False
     try:
+        async with container() as request_container:
+            security_service = await request_container.get(SecurityService)
+            current_user = await security_service.get_current_user(token)
+
+        async with container() as request_container:
+            room_websocket_service = await request_container.get(RoomWebSocketService)
+            await room_websocket_service.subscribe_room_webscoket(
+                room_id, current_user, websocket
+            )
+        subscribed = True
+
         while True:
             raw_message: dict[str, any] = await websocket.receive_json()
             logger.debug(f"{raw_message} {type(raw_message)}")
             ws_message = WebSocketMessage(**raw_message)
             try:
                 async with container() as request_container:
-                    room_service = await request_container.get(
-                        RoomWebSocketService
-                    )
-                    await room_service.handle_message(ws_message)
+                    room_service = await request_container.get(RoomWebSocketService)
+                    await room_service.handle_message(ws_message, current_user)
 
             except DomainException as e:
                 logger.error(
-                    f"Error on handling message: {ws_message.model_dump()}\nError: {e.args}"
+                    f"Error on handling message: {ws_message.model_dump()}\n"
+                    f"Error: {e.args}"
                 )
                 await websocket.send_json(
                     WebSocketMessage(
                         message_type=WebSocketMessageTypeEnum.ERROR,
                         topic=WebSocketTopicEnum(e.topic),
                         timestamp=datetime.now().isoformat(),
-                        payload=WebSocketGameInfoPayload(text=e.message),
+                        payload=WSGameInfoPayload(text=e.message),
                     ).model_dump_json(by_alias=True)
                 )
 
     except WebSocketDisconnect:
-        logger.info(
-            f"{current_user.username} разорвал соединение с комнатой {room_id}"
-        )
-        async with container() as request_container:
-            room_service = await request_container.get(RoomWebSocketService)
-            await room_service.unsubscribe_room_webscoket(room_id, current_user)
+        username = current_user.username if current_user else ""
+        logger.info(f"{username} разорвал соединение с комнатой {room_id}")
+
+    finally:
+        # Очистка должна выполняться при любом выходе (disconnect, отмена задачи,
+        # исключение во время подписки), иначе лобби/участники остаются в Redis.
+        if subscribed and current_user is not None:
+            try:
+                async with container() as request_container:
+                    room_service = await request_container.get(RoomWebSocketService)
+                    await room_service.unsubscribe_room_webscoket(room_id, current_user)
+            except Exception as e:
+                logger.error(f"Error on unsubscribe: {e.args}")

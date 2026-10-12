@@ -8,7 +8,7 @@ from domain.services import RoleDistributionService
 from domain.exceptions import DomainException, RoomNotFoundException
 from infrastructure.logger import get_logger
 from infrastructure.websocket.dtos import (
-    WebSocketGameCommandPayload,
+    WSGameCommandPayload,
 )
 from infrastructure.redis.repositories import GameRepository, LobbyRepository
 
@@ -58,7 +58,7 @@ class GameService:
         return await self._game_repository.save_game(game)
 
     async def process_role_action(
-        self, game_command: WebSocketGameCommandPayload
+        self, game_command: WSGameCommandPayload
     ) -> bool | None:
         """
         Обрабатывает ночной ход игрока
@@ -75,7 +75,7 @@ class GameService:
         await self.save_game(game)
         return result if isinstance(result, bool) else None
 
-    async def process_vote(self, game_command: WebSocketGameCommandPayload) -> Game:
+    async def process_vote(self, game_command: WSGameCommandPayload) -> Game:
         """
         Обрабатывает голос игрока
         """

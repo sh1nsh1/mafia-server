@@ -45,34 +45,34 @@ async def get_lobby_by_id(
     return result
 
 
-@lobby_router.post("/{lobby_id}/join")
-@inject
-async def join_lobby(
-    lobby_id: str,
-    current_user: FromDishka[CurrentUser],
-    lobby_service: FromDishka[LobbyService],
-):
-    command = LobbyJoinCommand(lobby_id, current_user.id)
-    try:
-        return await lobby_service.join_lobby(command)
-    except DomainException as e:
-        raise HTTPException(405, e.message)
+# @lobby_router.post("/{lobby_id}/join")
+# @inject
+# async def join_lobby(
+#     lobby_id: str,
+#     current_user: FromDishka[CurrentUser],
+#     lobby_service: FromDishka[LobbyService],
+# ):
+#     command = LobbyJoinCommand(lobby_id, current_user.id)
+#     try:
+#         return await lobby_service.join_lobby(command)
+#     except DomainException as e:
+#         raise HTTPException(405, e.message)
 
 
-@lobby_router.post("/{lobby_id}/leave")
-@inject
-async def leave_lobby(
-    lobby_id: str,
-    current_user: FromDishka[CurrentUser],
-    lobby_service: FromDishka[LobbyService],
-):
-    command = LobbyLeaveCommand(lobby_id=lobby_id, user_id=current_user.id)
-    try:
-        await lobby_service.leave_lobby(command)
-        return LobbyLeaveResponse(
-            status="OK",
-            message="User successfuly left the lobby",
-            lobby_id=lobby_id,
-        )
-    except DomainException as e:
-        raise HTTPException(405, e.message)
+# @lobby_router.post("/{lobby_id}/leave")
+# @inject
+# async def leave_lobby(
+#     lobby_id: str,
+#     current_user: FromDishka[CurrentUser],
+#     lobby_service: FromDishka[LobbyService],
+# ):
+#     command = LobbyLeaveCommand(lobby_id=lobby_id, user_id=current_user.id)
+#     try:
+#         await lobby_service.leave_lobby(command)
+#         return LobbyLeaveResponse(
+#             status="OK",
+#             message="User successfuly left the lobby",
+#             lobby_id=lobby_id,
+#         )
+#     except DomainException as e:
+#         raise HTTPException(405, e.message)

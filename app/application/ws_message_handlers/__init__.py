@@ -1,8 +1,8 @@
-from .game_ws_message_handler import GameWebSocketMessageHandler
-from .lobby_ws_message_handler import LobbyWebSockeMessageHandler
+from .game_ws_message_handler import GameWSMessageHandler
+from .lobby_ws_message_handler import LobbyWSMessageHandler
 
 
 __all__ = [
-    "GameWebSocketMessageHandler",
-    "LobbyWebSockeMessageHandler",
+    "GameWSMessageHandler",
+    "LobbyWSMessageHandler",
 ]

@@ -24,7 +24,6 @@ class LobbyService:
         self._lobby_repository = repository
 
     async def create_lobby(self, command: LobbyCreateCommand):
-        logger.debug("LobbyAService.create_lobby")
         lobby = await self._lobby_repository.create_lobby(
             command.admin_id, command.max_players
         )
@@ -47,7 +46,6 @@ class LobbyService:
         updated_lobby = await self._lobby_repository.add_participant(
             command.lobby_id, command.user_id
         )
-        logger.debug("LobbyAService.join_lobby")
         logger.info(f"User {command.user_id} подключен к лобби {command.lobby_id}")
         return LobbyResponse(
             status="OK",

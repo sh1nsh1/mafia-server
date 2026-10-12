@@ -58,13 +58,14 @@ class WebSocketManager:
             connection.websocket = ws
             await self.handle_reconnect(connection, room_id, user_id)
 
-    async def handle_disconnect(self, room_id: str, user_id: UUID) -> RoomConnection:
+    async def handle_disconnect(
+        self, room_id: str, user_id: UUID
+    ) -> RoomConnection | None:
         logger.debug("handle_disconnect")
         connection = await self.get_room_connection(room_id, user_id)
         if not connection:
-            exc = AppException("Подключения не существует")
-            logger.error(exc)
-            raise exc
+            logger.warning("handle_disconnect: подключения не существует")
+            return None
 
         connection.is_disconnected = True
         return connection
@@ -72,7 +73,8 @@ class WebSocketManager:
     async def disconnect(self, room_id: str, user_id: UUID):
         logger.debug("disconnect")
         connection = await self.handle_disconnect(room_id, user_id)
-        await connection.websocket.close()
+        if connection:
+            await connection.websocket.close()
 
     async def delete_all_connections(self, room_id: str):
         logger.debug("disconnect_all")
@@ -111,7 +113,11 @@ class WebSocketManager:
 
     async def send_broadcast(self, message: WebSocketMessage, room_id: str):
         logger.debug("send_broadcast")
-        all_users = [user_id for user_id in self.active_connections[room_id].keys()]
+        room_connections = self.active_connections.get(room_id)
+        if not room_connections:
+            logger.debug(f"send_broadcast: нет подключений в комнате {room_id}")
+            return
+        all_users = list(room_connections.keys())
         logger.debug(all_users)
         await self.send_to_many(message, room_id, all_users)
 
