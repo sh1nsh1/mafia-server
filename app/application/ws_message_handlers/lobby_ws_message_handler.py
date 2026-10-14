@@ -106,4 +106,3 @@ class LobbyWSMessageHandler:
                 await self._websocket_manager.disconnect(
                     lobby_leave_command.lobby_id, lobby_leave_command.user_id
                 )
-                await self

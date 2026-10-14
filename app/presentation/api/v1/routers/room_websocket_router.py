@@ -3,6 +3,7 @@ from datetime import datetime
 from dishka import FromDishka, AsyncContainer
 from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.routing import APIRouter
+from starlette.websockets import WebSocketState
 from dishka.integrations.fastapi import inject
 
 from domain.enums import WebSocketTopicEnum, WebSocketMessageTypeEnum
@@ -44,7 +45,7 @@ async def room_websocket(
             )
         subscribed = True
 
-        while True:
+        while websocket.application_state == WebSocketState.CONNECTED:
             raw_message: dict[str, any] = await websocket.receive_json()
             logger.debug(f"{raw_message} {type(raw_message)}")
             ws_message = WebSocketMessage(**raw_message)

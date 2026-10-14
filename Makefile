@@ -1,4 +1,4 @@
-.PHONY: dev lint fmt typecheck fix
+.PHONY: dev lint fmt typecheck fix test
 
 all: typecheck lint fmt
 
@@ -17,3 +17,6 @@ typecheck:
 fix:
 	uv run ruff check --fix .
 	uv run ruff format .
+
+test:
+	uv run pytest
