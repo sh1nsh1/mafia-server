@@ -27,6 +27,9 @@ async def room_websocket(
     logger.debug("room_websocket")
     token = websocket.headers.get("authorization", "").removeprefix("Bearer ")
 
+    if not token:
+        token = websocket.query_params.get("authorization", "").removeprefix("Bearer ")
+
     current_user = None
     subscribed = False
     try:

@@ -75,13 +75,13 @@ class RoomWebSocketService:
             logger.error("Can't unsubscribe non-existing room")
             return
 
-        logger.info("leave ")
-        await self._lobby_service.leave_lobby(
-            LobbyLeaveCommand(
-                lobby_id=room_id,
-                user_id=current_user.id,
-            )
-        )
+        # logger.info("leave ")
+        # await self._lobby_service.leave_lobby(
+        #     LobbyLeaveCommand(
+        #         lobby_id=room_id,
+        #         user_id=current_user.id,
+        #     )
+        # )
 
         message = WebSocketMessage(
             message_type=WebSocketMessageTypeEnum.USER_LEAVE,
