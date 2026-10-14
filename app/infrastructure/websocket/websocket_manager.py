@@ -102,7 +102,7 @@ class WebSocketManager:
             await connection.message_queue.put(message)
         else:
             logger.info("send")
-            await connection.websocket.send_json(message.model_dump_json(by_alias=True))
+            await connection.websocket.send_text(message.model_dump_json(by_alias=True))
 
     async def send_to_many(
         self, message: WebSocketMessage, room_id: str, user_ids: list[UUID]

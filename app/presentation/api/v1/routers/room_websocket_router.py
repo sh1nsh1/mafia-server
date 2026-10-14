@@ -59,7 +59,7 @@ async def room_websocket(
                     f"Error on handling message: {ws_message.model_dump()}\n"
                     f"Error: {e.args}"
                 )
-                await websocket.send_json(
+                await websocket.send_text(
                     WebSocketMessage(
                         message_type=WebSocketMessageTypeEnum.ERROR,
                         topic=WebSocketTopicEnum(e.topic),

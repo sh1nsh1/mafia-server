@@ -49,13 +49,13 @@ def test_create_and_join_lobby(client: TestClient, redis_client, players):
             sessions.append(session)
             time.sleep(0.02)
             for existing in sessions:
-                message = json.loads(existing.receive_json())
+                message = json.loads(existing.receive_text())
                 if not lobby_admin:
                     lobby_admin.update(message["payload"]["user"])
                 assert message["messageType"] == WebSocketMessageTypeEnum.USER_CONNECT
 
         for i in range(len(sessions) - 1, -1, -1):
-            sessions[i].send_json(
+            sessions[i].send_text(
                 WebSocketMessage(
                     message_type=WebSocketMessageTypeEnum.COMMAND,
                     topic=(WebSocketTopicEnum.LOBBY),
@@ -66,7 +66,7 @@ def test_create_and_join_lobby(client: TestClient, redis_client, players):
                         room_id=lobby_id,
                         target_id=None,
                     ),
-                ).model_dump(mode="json"),
+                ).model_dump_json(by_alias=True),
             )
             # Сервер обрабатывает LEAVE и закрывает соединение. Дожидаемся
             # закрытия, чтобы выходы не выполнялись конкурентно (иначе
