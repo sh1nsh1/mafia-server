@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import (
 
 from infrastructure.logger import get_logger
 from infrastructure.environment import env
+from infrastructure.database.models import Base
 
 
 def get_db_url():
@@ -33,6 +34,12 @@ class DBSessionFactory:
         database_url = get_db_url()
         self.engine = create_async_engine(database_url, echo=False)
         self.session_maker = async_sessionmaker(self.engine)
+
+    async def create_tables(self) -> None:
+        """Создаёт отсутствующие таблицы по метаданным моделей (идемпотентно)."""
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("DB initiated")
 
     async def get_session(self) -> AsyncSession:
         """Возращает новую сессию"""

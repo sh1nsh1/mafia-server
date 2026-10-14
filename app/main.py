@@ -21,6 +21,7 @@ from presentation.providers import AuthProvider
 from infrastructure.providers import InfrastructureProvider
 from presentation.api.v1.routers.user_router import user_router
 from presentation.api.v1.routers.lobby_router import lobby_router
+from infrastructure.factories.db_session_factory import DBSessionFactory
 from presentation.api.v1.routers.room_websocket_router import (
     room_websocket_router,
 )
@@ -32,6 +33,8 @@ logger = get_logger(__name__, logging.DEBUG)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("Mafia server started")
+    db_session_factory = await container.get(DBSessionFactory)
+    await db_session_factory.create_tables()
     yield
     logger.debug("Mafia server shut down")
 

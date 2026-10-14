@@ -21,12 +21,31 @@ def redis_client():
 
 @pytest.fixture(scope="session")
 def players(client):
-    """Логин пяти игроков. Возвращает список {access_token, refresh_token}."""
+    """Регистрация и логин пяти игроков.
+
+    Возвращает список {access_token, refresh_token}.
+    """
     result = []
     for i in range(1, 6):
+        username = f"User{i}"
+        password = f"Userpwd{i}"
+
+        register_response = client.post(
+            "user/register/",
+            json={
+                "username": username,
+                "email": f"user{i}@mafia.local",
+                "password": password,
+            },
+        )
+        # 405 — пользователь уже создан в предыдущем прогоне
+        assert register_response.status_code in (200, 405), register_response.text
+        if register_response.status_code == 200:
+            assert register_response.json()["accessToken"]
+
         response = client.post(
             "user/login/",
-            data={"username": f"User{i}", "password": f"Userpwd{i}"},
+            data={"username": username, "password": password},
         )
         assert response.status_code == 200, response.text
         result.append(
