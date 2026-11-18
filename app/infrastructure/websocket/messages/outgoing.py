@@ -3,69 +3,72 @@ from typing import Literal
 from domain.enums import WebSocketTopic
 
 from .base_message import BaseMessage, GameMessage, LobbyMessage
-from .responses.game_data_payload import GameDataPayload
-from .responses.game_info_payload import GameInfoPayload
-from .responses.game_role_payload import GameRolePayload
-from .responses.lobby_data_payload import LobbyDataPayload
-from .responses.game_new_stage_payload import GameNewStagePayload
-from .responses.game_action_request_payload import (
-    GameActionRequestPayload,
+from .message_type import MessageType
+from .payloads.game_data_payload import GameDataPayload
+from .payloads.game_info_payload import GameInfoPayload
+from .payloads.game_role_payload import GameRolePayload
+from .payloads.lobby_data_payload import LobbyDataPayload
+from .payloads.game_new_stage_payload import GameNewStagePayload
+from .payloads.user_connection_payload import (
+    UserConnectionPayload,
 )
-from .responses.user_connection_message_payload import (
-    UserConnectionMessagePayload,
+from .payloads.game_action_request_payload import (
+    GameActionRequestPayload,
 )
 
 
 class GameInfoMessage(GameMessage):
-    message_type: Literal["Info"] = "Info"
+    message_type: Literal[MessageType.INFO] = MessageType.INFO
     payload: GameInfoPayload
 
 
 class GameEventMessage(GameMessage):
-    message_type: Literal["Event"] = "Event"
+    message_type: Literal[MessageType.EVENT] = MessageType.EVENT
     payload: GameInfoPayload
 
 
 class GameStartMessage(GameMessage):
-    message_type: Literal["GameStart"] = "GameStart"
+    message_type: Literal[MessageType.GAME_START] = MessageType.GAME_START
     payload: GameInfoPayload
 
 
 class GameFinishMessage(GameMessage):
-    message_type: Literal["GameFinish"] = "GameFinish"
+    message_type: Literal[MessageType.GAME_FINISH] = MessageType.GAME_FINISH
     payload: GameInfoPayload
 
 
 class GameActionRequestMessage(GameMessage):
-    message_type: Literal["ActionRequest"] = "ActionRequest"
+    message_type: Literal[MessageType.ACTION_REQUEST] = (
+        MessageType.ACTION_REQUEST
+    )
     payload: GameActionRequestPayload
 
 
 class GameRoleMessage(GameMessage):
-    message_type: Literal["Role"] = "Role"
+    message_type: Literal[MessageType.ROLE] = MessageType.ROLE
     payload: GameRolePayload
 
 
 class GameNewStageMessage(GameMessage):
-    message_type: Literal["NewStage"] = "NewStage"
+    message_type: Literal[MessageType.NEW_STAGE] = MessageType.NEW_STAGE
     payload: GameNewStagePayload
 
 
 class GameDataMessage(GameMessage):
-    message_type: Literal["GameData"] = "GameData"
+    message_type: Literal[MessageType.GAME_DATA] = MessageType.GAME_DATA
     payload: GameDataPayload
 
 
 class LobbyDataMessage(LobbyMessage):
-    message_type: Literal["LobbyData"] = "LobbyData"
+    message_type: Literal[MessageType.LOBBY_DATA] = MessageType.LOBBY_DATA
     payload: LobbyDataPayload
 
 
 class ErrorMessage(BaseMessage):
-    """Ошибка может прийти в любом топике (Game, Lobby, System)"""
+    """Ошибка, которая может прийти в любом топике"""
 
     topic: WebSocketTopic
-    message_type: Literal["Error"] = "Error"
+    message_type: Literal[MessageType.ERROR] = MessageType.ERROR
     payload: GameInfoPayload
 
 
@@ -73,13 +76,13 @@ class UserConnectMessage(BaseMessage):
     """Подключение к комнате: топик зависит от того, лобби это или игра"""
 
     topic: WebSocketTopic
-    message_type: Literal["UserConnect"] = "UserConnect"
-    payload: UserConnectionMessagePayload
+    message_type: Literal[MessageType.USER_CONNECT] = MessageType.USER_CONNECT
+    payload: UserConnectionPayload
 
 
 class UserLeaveMessage(BaseMessage):
     """Отключение от комнаты: топик зависит от того, лобби это или игра"""
 
     topic: WebSocketTopic
-    message_type: Literal["UserLeave"] = "UserLeave"
-    payload: UserConnectionMessagePayload
+    message_type: Literal[MessageType.USER_LEAVE] = MessageType.USER_LEAVE
+    payload: UserConnectionPayload

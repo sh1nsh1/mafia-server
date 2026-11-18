@@ -3,17 +3,18 @@ from typing import Literal, Annotated
 from pydantic import Field, TypeAdapter
 
 from .base_message import GameMessage, LobbyMessage
-from .requests.game_command_payload import GameCommandPayload
-from .requests.lobby_command_payload import LobbyCommandPayload
+from .message_type import MessageType
+from .payloads.game_command_payload import GameCommandPayload
+from .payloads.lobby_command_payload import LobbyCommandPayload
 
 
 class GameCommandMessage(GameMessage):
-    message_type: Literal["Command"] = "Command"
+    message_type: Literal[MessageType.COMMAND] = MessageType.COMMAND
     payload: GameCommandPayload
 
 
 class LobbyCommandMessage(LobbyMessage):
-    message_type: Literal["Command"] = "Command"
+    message_type: Literal[MessageType.COMMAND] = MessageType.COMMAND
     payload: LobbyCommandPayload
 
 

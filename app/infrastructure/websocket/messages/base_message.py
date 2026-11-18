@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal
 from datetime import datetime
 
 from pydantic import Field, BaseModel, ConfigDict
@@ -14,7 +14,6 @@ class BaseMessage(BaseModel):
     """
 
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
-    payload: Any
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -23,6 +22,8 @@ class BaseMessage(BaseModel):
     )
 
     def to_json(self) -> str:
+        """Конвертация в JSON строку"""
+
         return self.model_dump_json(by_alias=True)
 
 
