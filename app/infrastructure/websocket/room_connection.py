@@ -4,17 +4,17 @@ from collections.abc import Callable, Awaitable
 
 from fastapi import WebSocket
 
-from infrastructure.websocket.messages.websocket_message import WebSocketMessage
+from infrastructure.websocket.messages import OutgoingMessage
 
 
 class RoomConnection:
     send_state_message: Callable[[str, UUID], Awaitable[None]]
-    last_action_request_message: WebSocketMessage | None
+    last_action_request_message: OutgoingMessage | None
 
     def __init__(
         self,
         websocket: WebSocket,
-        message_queue: asyncio.Queue,
+        message_queue: asyncio.Queue[OutgoingMessage],
     ):
         self.websocket = websocket
         self.message_queue = message_queue

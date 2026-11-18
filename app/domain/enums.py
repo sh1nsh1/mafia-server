@@ -1,4 +1,9 @@
 from enum import StrEnum
+from typing import Literal
+
+
+WebSocketTopic = Literal["Game", "Lobby", "System"]
+"""Топик WebSocket-сообщения (лобби, игра, системные сообщения)"""
 
 
 class TeamEnum(StrEnum):
@@ -16,10 +21,12 @@ class RoleEnum(StrEnum):
     CITIZEN = "Citizen"
     MAFIA_MEMBER = "MafiaMember"
     SHERIFF = "Sheriff"
+
     # Amateur mode
     DOCTOR = "Doctor"
     MAFIA_DON = "MafiaDon"
     PROSTITUTE = "Prostitute"
+
     # Extended mode
     MANIAC = "Maniac"
     DEPUTY_SHERIFF = "DeputySheriff"
@@ -64,12 +71,6 @@ class WebSocketMessageTypeEnum(StrEnum):
     GAME_FINISH = "GameFinish"
 
     ROLE = "Role"
-
-
-class WebSocketTopicEnum(StrEnum):
-    LOBBY = "Lobby"
-    GAME = "Game"
-    SYSTEM = "System"
 
 
 class WebSocketGameCommandActionTypeEnum(StrEnum):

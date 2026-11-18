@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from dishka import FromDishka
 
-from domain.enums import RoleEnum, GameStageEnum, WebSocketTopicEnum
+from domain.enums import RoleEnum, GameStageEnum
 from domain.entities import Game, Lobby, Player
 from domain.services import RoleDistributionService
 from domain.exceptions import DomainException, RoomNotFoundException
@@ -77,10 +77,7 @@ class GameService:
         logger.debug(f"process_role_action {game_command.room_id}")
         game = await self.get_game_by_id(game_command.room_id)
         if not game_command.target_id:
-            raise DomainException(
-                WebSocketTopicEnum.GAME,
-                "WebSocketGameCommand missing target_id",
-            )
+            raise DomainException("WebSocketGameCommand missing target_id")
         result = await game.process_role_action(
             game_command.actor_id, game_command.target_id
         )
@@ -94,10 +91,7 @@ class GameService:
         logger.debug(f"process_vote {game_command.room_id}")
         game = await self.get_game_by_id(game_command.room_id)
         if not game_command.target_id:
-            raise DomainException(
-                WebSocketTopicEnum.GAME,
-                "WebSocketGameCommand missing target_id",
-            )
+            raise DomainException("WebSocketGameCommand missing target_id")
         await game.process_vote(game_command.actor_id, game_command.target_id)
         return await self.save_game(game)
 

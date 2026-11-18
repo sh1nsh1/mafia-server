@@ -10,7 +10,6 @@ from domain.enums import (
     GameStageEnum,
     GameStatusEnum,
     PlayerStatusEnum,
-    WebSocketTopicEnum,
 )
 from domain.exceptions import (
     RepoException,
@@ -242,7 +241,6 @@ class GameRepository:
         )
         if not user:
             raise RepoException(
-                topic=WebSocketTopicEnum.GAME,
                 message=f"User {player_user_id} not found in DB",
                 user_id=player_user_id,
             )
@@ -250,7 +248,6 @@ class GameRepository:
         player_model = await self._get_player_model_by_user_id(player_user_id)
         if not player_model:
             raise RepoException(
-                topic=WebSocketTopicEnum.GAME,
                 message=f"Player {player_user_id} not found in Redis",
                 user_id=player_user_id,
             )
@@ -267,7 +264,6 @@ class GameRepository:
         role = await self._create_role_from_name(player_model.role_name.value)
         if not role:
             exc = RepoException(
-                topic=WebSocketTopicEnum.GAME,
                 message=f"Role not found {player_model.role_name.value}",
                 user_id=player_user_id,
             )
@@ -348,7 +344,6 @@ class GameRepository:
         )
         if not admin:
             raise RepoException(
-                topic=WebSocketTopicEnum.GAME,
                 message=f"Admin not found in game {game_model.id}",
                 context_id=game_model.id,
             )

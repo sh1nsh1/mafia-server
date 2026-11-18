@@ -1,6 +1,6 @@
 from random import shuffle
 
-from domain.enums import RoleEnum, WebSocketTopicEnum
+from domain.enums import RoleEnum
 from domain.exceptions import DomainException
 from domain.entities.user import User
 from domain.entities.player import (
@@ -42,9 +42,8 @@ class RoleDistributionService:
         logger.debug(roles_to_distribute)
         if len(users) != len(roles_to_distribute):
             exc = DomainException(
-                WebSocketTopicEnum.GAME,
                 "Количество игроков не соотвествует количеству ролей - "
-                f"{len(users)}",
+                f"{len(users)}"
             )
             logger.error(exc)
             raise exc
@@ -64,17 +63,14 @@ class RoleDistributionService:
         players_remaining = player_count
         required_roles = [RoleEnum.MAFIA_MEMBER, RoleEnum.CITIZEN]
         if any([role not in role_set for role in required_roles]):
-            exc = DomainException(
-                WebSocketTopicEnum.GAME, "В списке ролей нет необходимых"
-            )
+            exc = DomainException("В списке ролей нет необходимых")
             logger.error(exc)
             raise exc
 
         if player_count < 5:
             exc = DomainException(
-                WebSocketTopicEnum.GAME,
                 "Количество игроков не соотвествует количеству ролей - "
-                f"{player_count}",
+                f"{player_count}"
             )
             logger.error(exc)
             raise exc
@@ -118,9 +114,7 @@ class RoleDistributionService:
                 for role_name in role_name_list
             ]
         ):
-            raise DomainException(
-                WebSocketTopicEnum.GAME, "Неизвестная роль в списке"
-            )
+            raise DomainException("Неизвестная роль в списке")
         roles = [
             await self._create_role_from_name(role_name)
             for role_name in role_name_list
@@ -145,6 +139,4 @@ class RoleDistributionService:
             case RoleEnum.DOCTOR.value:
                 return Doctor()
             case _:
-                raise DomainException(
-                    WebSocketTopicEnum.GAME, "Неизвестная роль в списке"
-                )
+                raise DomainException("Неизвестная роль в списке")

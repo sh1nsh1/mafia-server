@@ -1,10 +1,10 @@
 from presentation.api.v1.dtos.responses import UserResponse, LobbyResponse
-from infrastructure.websocket.messages.base_websocket_message import (
-    BaseWebSocketMessage,
+from infrastructure.websocket.messages.base_payload import (
+    BasePayload,
 )
 
 
-class WSUserConnectionMessagePayload(BaseWebSocketMessage):
+class WSUserConnectionMessagePayload(BasePayload):
     text: str
     user: UserResponse
     lobby: LobbyResponse | None

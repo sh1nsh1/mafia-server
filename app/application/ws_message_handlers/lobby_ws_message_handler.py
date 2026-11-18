@@ -1,7 +1,6 @@
 from dishka import FromDishka
 
 from domain.enums import (
-    WebSocketTopicEnum,
     WebSocketMessageTypeEnum,
     WebSocketLobbyCommandTypeEnum,
 )
@@ -11,7 +10,7 @@ from application.services import GameService, GameManagerService
 from infrastructure.websocket import WebSocketManager
 from infrastructure.logger_config import get_logger
 from infrastructure.websocket.messages import (
-    WebSocketMessage,
+    LobbyMessage,
     WSLobbyCommandPayload,
 )
 from presentation.api.v1.dtos.requests import CurrentUser
@@ -36,23 +35,25 @@ class LobbyWSMessageHandler:
         self._game_manager = game_manager
         self._websocket_manager = websocket_manager
 
-    async def handle(
-        self, message: WebSocketMessage, current_user: CurrentUser
-    ):
+    async def handle(self, message: LobbyMessage, current_user: CurrentUser):
         logger.debug("handle")
         logger.debug(message.model_dump_json())
         """
         Обрабатывает Lobby Websocket Message взависимости от его типа
         """
         if message.message_type == WebSocketMessageTypeEnum.COMMAND:
-            ws_command = WSLobbyCommandPayload(**message.payload.model_dump())
+            if not isinstance(message.payload, WSLobbyCommandPayload):
+                raise DomainException(
+                    "Неожиданный payload команды лобби", topic="Lobby"
+                )
+            ws_command = message.payload
 
             # S T A R T
             if ws_command.action_type == WebSocketLobbyCommandTypeEnum.START:
                 if not ws_command.role_set:
                     exc = DomainException(
-                        WebSocketTopicEnum.LOBBY,
                         "WebsSocketCommand missing role_set",
+                        topic="Lobby",
                     )
                     logger.error(exc)
                     raise exc
@@ -79,8 +80,8 @@ class LobbyWSMessageHandler:
             elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.KICK:
                 if not ws_command.target_id:
                     exc = DomainException(
-                        WebSocketTopicEnum.LOBBY,
                         "WebSocket KICK command missing target_id",
+                        topic="Lobby",
                     )
                     logger.error(exc)
                     raise exc

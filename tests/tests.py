@@ -1,6 +1,5 @@
 import json
 import time
-from datetime import datetime
 from contextlib import ExitStack
 
 import pytest
@@ -9,12 +8,11 @@ from starlette.testclient import WebSocketTestSession
 from starlette.websockets import WebSocketDisconnect
 
 from domain.enums import (
-    WebSocketTopicEnum,
     WebSocketMessageTypeEnum,
     WebSocketLobbyCommandTypeEnum,
 )
-from infrastructure.websocket.dtos import (
-    WebSocketMessage,
+from infrastructure.websocket.messages import (
+    LobbyMessage,
     WSLobbyCommandPayload,
 )
 
@@ -58,20 +56,19 @@ def test_create_and_join_lobby(client: TestClient, redis_client, players):
                     message["messageType"]
                     == WebSocketMessageTypeEnum.USER_CONNECT
                 )
+                assert message["topic"] == "Lobby"
 
         for i in range(len(sessions) - 1, -1, -1):
             sessions[i].send_text(
-                WebSocketMessage(
+                LobbyMessage(
                     message_type=WebSocketMessageTypeEnum.COMMAND,
-                    topic=WebSocketTopicEnum.LOBBY,
-                    timestamp=datetime.now().isoformat(),
                     payload=WSLobbyCommandPayload(
                         action_type=WebSocketLobbyCommandTypeEnum.LEAVE,
                         role_set=None,
                         room_id=lobby_id,
                         target_id=None,
                     ),
-                ).model_dump_json(by_alias=True),
+                ).to_json(),
             )
             # Сервер обрабатывает LEAVE и закрывает соединение. Дожидаемся
             # закрытия, чтобы выходы не выполнялись конкурентно (иначе

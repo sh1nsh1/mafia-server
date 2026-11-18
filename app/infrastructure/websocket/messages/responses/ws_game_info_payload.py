@@ -1,7 +1,7 @@
-from infrastructure.websocket.messages.base_websocket_message import (
-    BaseWebSocketMessage,
+from infrastructure.websocket.messages.base_payload import (
+    BasePayload,
 )
 
 
-class WSGameInfoPayload(BaseWebSocketMessage):
+class WSGameInfoPayload(BasePayload):
     text: str

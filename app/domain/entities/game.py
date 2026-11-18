@@ -7,7 +7,6 @@ from domain.enums import (
     GameStageEnum,
     GameStatusEnum,
     PlayerStatusEnum,
-    WebSocketTopicEnum,
 )
 from domain.exceptions import DomainException
 from domain.entities.user import User
@@ -98,8 +97,7 @@ class Game:
 
         if not (actor and target):
             raise DomainException(
-                WebSocketTopicEnum.GAME,
-                f"Actor or Target not found in game {self.id}",
+                f"Actor or Target not found in game {self.id}"
             )
 
         result = actor.perform_role_action(target)
@@ -123,8 +121,7 @@ class Game:
 
         if not (actor and target):
             exc = DomainException(
-                WebSocketTopicEnum.GAME,
-                f"Actor or Target not found in game {self.id}",
+                f"Actor or Target not found in game {self.id}"
             )
             logger.error(exc)
             raise exc

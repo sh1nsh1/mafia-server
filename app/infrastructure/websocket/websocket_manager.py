@@ -7,7 +7,7 @@ from fastapi import WebSocket
 from domain.enums import WebSocketMessageTypeEnum
 from domain.exceptions import AppException
 from infrastructure.logger_config import get_logger
-from infrastructure.websocket.messages import WebSocketMessage
+from infrastructure.websocket.messages import OutgoingMessage
 from infrastructure.websocket.room_connection import RoomConnection
 
 
@@ -88,7 +88,7 @@ class WebSocketManager:
         del self.active_connections[room_id]
 
     async def send_to_one(
-        self, message: WebSocketMessage, room_id: str, user_id: UUID
+        self, message: OutgoingMessage, room_id: str, user_id: UUID
     ):
         """
         Отправить message игроку user_id в комнате room_id
@@ -108,18 +108,16 @@ class WebSocketManager:
             await connection.message_queue.put(message)
         else:
             logger.info("send")
-            await connection.websocket.send_text(
-                message.model_dump_json(by_alias=True)
-            )
+            await connection.websocket.send_text(message.to_json())
 
     async def send_to_many(
-        self, message: WebSocketMessage, room_id: str, user_ids: list[UUID]
+        self, message: OutgoingMessage, room_id: str, user_ids: list[UUID]
     ):
         logger.debug("send_to_many")
         for user_id in user_ids:
             await self.send_to_one(message, room_id, user_id)
 
-    async def send_broadcast(self, message: WebSocketMessage, room_id: str):
+    async def send_broadcast(self, message: OutgoingMessage, room_id: str):
         logger.debug("send_broadcast")
         room_connections = self.active_connections.get(room_id)
         if not room_connections:
@@ -155,7 +153,7 @@ class WebSocketManager:
             connection.is_disconnected = True
 
         while not connection.message_queue.empty():
-            message: WebSocketMessage = connection.message_queue.get_nowait()
+            message: OutgoingMessage = connection.message_queue.get_nowait()
             # во время отправки сообщения разблокировать получение
             connection.is_disconnected = False
             if not connection.is_callback_set:

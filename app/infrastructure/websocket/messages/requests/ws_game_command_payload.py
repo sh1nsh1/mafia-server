@@ -1,12 +1,12 @@
 from uuid import UUID
 
 from domain.enums import WebSocketGameCommandActionTypeEnum
-from infrastructure.websocket.messages.base_websocket_message import (
-    BaseWebSocketMessage,
+from infrastructure.websocket.messages.base_payload import (
+    BasePayload,
 )
 
 
-class WSGameCommandPayload(BaseWebSocketMessage):
+class WSGameCommandPayload(BasePayload):
     action_type: WebSocketGameCommandActionTypeEnum
     actor_id: UUID
     target_id: UUID | None

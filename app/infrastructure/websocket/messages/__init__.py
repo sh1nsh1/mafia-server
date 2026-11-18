@@ -1,4 +1,15 @@
-from .websocket_message import WebSocketMessage
+from .base_message import BaseMessage
+from .websocket_message import (
+    GameMessage,
+    GamePayload,
+    LobbyMessage,
+    LobbyPayload,
+    SystemMessage,
+    SystemPayload,
+    IncomingMessage,
+    OutgoingMessage,
+    IncomingMessageAdapter,
+)
 from .responses.ws_game_data_payload import WSGameDataPayload
 from .responses.ws_game_info_payload import WSGameInfoPayload
 from .responses.ws_game_role_payload import WSGameRolePayload
@@ -13,6 +24,16 @@ from .responses.ws_user_connection_message_payload import (
 
 
 __all__ = [
+    "BaseMessage",
+    "GameMessage",
+    "GamePayload",
+    "IncomingMessage",
+    "IncomingMessageAdapter",
+    "LobbyMessage",
+    "LobbyPayload",
+    "OutgoingMessage",
+    "SystemMessage",
+    "SystemPayload",
     "WSGameActionRequestPayload",
     "WSGameCommandPayload",
     "WSGameDataPayload",
@@ -21,6 +42,5 @@ __all__ = [
     "WSGameRolePayload",
     "WSLobbyCommandPayload",
     "WSLobbyDataPayload",
-    "WebSocketMessage",
     "WSUserConnectionMessagePayload",
 ]

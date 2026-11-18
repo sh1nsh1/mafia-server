@@ -1,10 +1,7 @@
-from datetime import datetime
-
 from dishka import FromDishka
 
 from domain.enums import (
     GameStageEnum,
-    WebSocketTopicEnum,
     WebSocketMessageTypeEnum,
     WebSocketGameCommandActionTypeEnum,
 )
@@ -14,7 +11,7 @@ from application.services import GameService, GameManagerService
 from infrastructure.websocket import WebSocketManager
 from infrastructure.logger_config import get_logger
 from infrastructure.websocket.messages import (
-    WebSocketMessage,
+    GameMessage,
     WSGameInfoPayload,
     WSGameCommandPayload,
 )
@@ -35,14 +32,14 @@ class GameWSMessageHandler:
         self._game_manager = game_manager
         self._websocket_manager = websocket_manager
 
-    async def handle(
-        self, message: WebSocketMessage, current_user: CurrentUser
-    ):
+    async def handle(self, message: GameMessage, current_user: CurrentUser):
         """
         Обрабатывает Websocket Message взависимости от его типа
         """
         if message.message_type == WebSocketMessageTypeEnum.COMMAND:
-            ws_command = WSGameCommandPayload(**message.payload.model_dump())
+            if not isinstance(message.payload, WSGameCommandPayload):
+                raise DomainException("Неожиданный payload игровой команды")
+            ws_command = message.payload
             game_command = GameCommand(
                 actor_id=current_user.id,
                 room_id=ws_command.room_id,
@@ -57,9 +54,7 @@ class GameWSMessageHandler:
             ):
                 try:
                     if game.game_stage != GameStageEnum.NIGHT:
-                        raise DomainException(
-                            WebSocketTopicEnum.GAME, "Неожиданное сообщение"
-                        )
+                        raise DomainException("Неожиданное сообщение")
                     result = await self._game_service.process_role_action(
                         game_command
                     )
@@ -69,10 +64,8 @@ class GameWSMessageHandler:
                         f"in room {ws_command.room_id}: {e.args}"
                     )
                     await self._websocket_manager.send_to_one(
-                        WebSocketMessage(
+                        GameMessage(
                             message_type=WebSocketMessageTypeEnum.ERROR,
-                            topic=WebSocketTopicEnum(e.topic),
-                            timestamp=datetime.now().isoformat(),
                             payload=WSGameInfoPayload(
                                 text=e.message or "Неизвестная ошибка"
                             ),
@@ -95,9 +88,7 @@ class GameWSMessageHandler:
             ):
                 try:
                     if game.game_stage != GameStageEnum.DAY_VOTE:
-                        raise DomainException(
-                            WebSocketTopicEnum.GAME, "Неожиданное сообщение"
-                        )
+                        raise DomainException("Неожиданное сообщение")
                     await self._game_service.process_vote(game_command)
                     target_id = str(ws_command.target_id)
 
@@ -107,10 +98,8 @@ class GameWSMessageHandler:
                         f"in room {ws_command.room_id}: {e.args}"
                     )
                     await self._websocket_manager.send_to_one(
-                        WebSocketMessage(
+                        GameMessage(
                             message_type=WebSocketMessageTypeEnum.ERROR,
-                            topic=WebSocketTopicEnum(e.topic),
-                            timestamp=datetime.now().isoformat(),
                             payload=WSGameInfoPayload(
                                 text=e.message or "Неизвестная ошибка"
                             ),

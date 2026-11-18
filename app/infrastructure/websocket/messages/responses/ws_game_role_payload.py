@@ -1,9 +1,9 @@
 from domain.enums import RoleEnum
-from infrastructure.websocket.messages.base_websocket_message import (
-    BaseWebSocketMessage,
+from infrastructure.websocket.messages.base_payload import (
+    BasePayload,
 )
 
 
-class WSGameRolePayload(BaseWebSocketMessage):
+class WSGameRolePayload(BasePayload):
     text: str
     role: RoleEnum
