@@ -4,10 +4,12 @@ from collections.abc import Callable, Awaitable
 
 from fastapi import WebSocket
 
-from domain.enums import WebSocketMessageTypeEnum
 from domain.exceptions import AppException
 from infrastructure.logger_config import get_logger
-from infrastructure.websocket.messages import OutgoingMessage
+from infrastructure.websocket.messages import (
+    BaseMessage,
+    GameActionRequestMessage,
+)
 from infrastructure.websocket.room_connection import RoomConnection
 
 
@@ -88,7 +90,7 @@ class WebSocketManager:
         del self.active_connections[room_id]
 
     async def send_to_one(
-        self, message: OutgoingMessage, room_id: str, user_id: UUID
+        self, message: BaseMessage, room_id: str, user_id: UUID
     ):
         """
         Отправить message игроку user_id в комнате room_id
@@ -111,13 +113,13 @@ class WebSocketManager:
             await connection.websocket.send_text(message.to_json())
 
     async def send_to_many(
-        self, message: OutgoingMessage, room_id: str, user_ids: list[UUID]
+        self, message: BaseMessage, room_id: str, user_ids: list[UUID]
     ):
         logger.debug("send_to_many")
         for user_id in user_ids:
             await self.send_to_one(message, room_id, user_id)
 
-    async def send_broadcast(self, message: OutgoingMessage, room_id: str):
+    async def send_broadcast(self, message: BaseMessage, room_id: str):
         logger.debug("send_broadcast")
         room_connections = self.active_connections.get(room_id)
         if not room_connections:
@@ -153,15 +155,13 @@ class WebSocketManager:
             connection.is_disconnected = True
 
         while not connection.message_queue.empty():
-            message: OutgoingMessage = connection.message_queue.get_nowait()
+            message: BaseMessage = connection.message_queue.get_nowait()
             # во время отправки сообщения разблокировать получение
             connection.is_disconnected = False
             if not connection.is_callback_set:
                 await self.send_to_one(message, room_id, user_id)
 
-            elif message.message_type in [
-                WebSocketMessageTypeEnum.ACTION_REQUEST
-            ]:
+            elif isinstance(message, GameActionRequestMessage):
                 connection.last_action_request_message = message
 
             connection.is_disconnected = True

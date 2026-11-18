@@ -1,7 +1,7 @@
 from dishka import FromDishka
 from fastapi import WebSocket
 
-from domain.enums import WebSocketMessageTypeEnum
+from domain.enums import WebSocketTopic
 from application.commands import LobbyJoinCommand
 from application.services import UserService, LobbyService
 from infrastructure.websocket import WebSocketManager
@@ -11,10 +11,11 @@ from application.ws_message_handlers import (
     LobbyWSMessageHandler,
 )
 from infrastructure.websocket.messages import (
-    GameMessage,
-    LobbyMessage,
-    SystemMessage,
     IncomingMessage,
+    UserLeaveMessage,
+    GameCommandMessage,
+    UserConnectMessage,
+    LobbyCommandMessage,
     WSUserConnectionMessagePayload,
 )
 from presentation.api.v1.dtos.requests import CurrentUser
@@ -51,9 +52,9 @@ class RoomWebSocketService:
             LobbyJoinCommand(room_id, current_user.id)
         )
 
-        message_cls = LobbyMessage if lobby else GameMessage
-        message = message_cls(
-            message_type=WebSocketMessageTypeEnum.USER_CONNECT,
+        topic: WebSocketTopic = "Lobby" if lobby else "Game"
+        message = UserConnectMessage(
+            topic=topic,
             payload=WSUserConnectionMessagePayload(
                 text=f"User {current_user.username} подключился к комнате",
                 user=UserResponse(
@@ -89,9 +90,9 @@ class RoomWebSocketService:
         #     )
         # )
 
-        message_cls = LobbyMessage if user_joined_room.is_lobby else GameMessage
-        message = message_cls(
-            message_type=WebSocketMessageTypeEnum.USER_LEAVE,
+        topic: WebSocketTopic = "Lobby" if user_joined_room.is_lobby else "Game"
+        message = UserLeaveMessage(
+            topic=topic,
             payload=WSUserConnectionMessagePayload(
                 text=f"User {current_user.username} покинул комнату",
                 user=UserResponse(
@@ -111,14 +112,10 @@ class RoomWebSocketService:
     ):
         logger.debug("handle_message")
         match message:
-            case LobbyMessage():
+            case LobbyCommandMessage():
                 await self._lobby_websocket_handler.handle(
                     message, current_user
                 )
 
-            case GameMessage():
+            case GameCommandMessage():
                 await self._game_websocket_handler.handle(message, current_user)
-
-            case SystemMessage():
-                pass
-                # TODO

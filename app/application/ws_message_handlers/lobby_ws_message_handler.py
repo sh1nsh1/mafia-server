@@ -1,18 +1,12 @@
 from dishka import FromDishka
 
-from domain.enums import (
-    WebSocketMessageTypeEnum,
-    WebSocketLobbyCommandTypeEnum,
-)
+from domain.enums import WebSocketLobbyCommandTypeEnum
 from domain.exceptions import DomainException, RoomNotFoundException
 from application.commands import LobbyLeaveCommand
 from application.services import GameService, GameManagerService
 from infrastructure.websocket import WebSocketManager
 from infrastructure.logger_config import get_logger
-from infrastructure.websocket.messages import (
-    LobbyMessage,
-    WSLobbyCommandPayload,
-)
+from infrastructure.websocket.messages import LobbyCommandMessage
 from presentation.api.v1.dtos.requests import CurrentUser
 from application.services.lobby_service import LobbyService
 
@@ -35,83 +29,78 @@ class LobbyWSMessageHandler:
         self._game_manager = game_manager
         self._websocket_manager = websocket_manager
 
-    async def handle(self, message: LobbyMessage, current_user: CurrentUser):
+    async def handle(
+        self, message: LobbyCommandMessage, current_user: CurrentUser
+    ):
         logger.debug("handle")
         logger.debug(message.model_dump_json())
         """
-        Обрабатывает Lobby Websocket Message взависимости от его типа
+        Обрабатывает команду лобби
         """
-        if message.message_type == WebSocketMessageTypeEnum.COMMAND:
-            if not isinstance(message.payload, WSLobbyCommandPayload):
-                raise DomainException(
-                    "Неожиданный payload команды лобби", topic="Lobby"
-                )
-            ws_command = message.payload
+        ws_command = message.payload
 
-            # S T A R T
-            if ws_command.action_type == WebSocketLobbyCommandTypeEnum.START:
-                if not ws_command.role_set:
-                    exc = DomainException(
-                        "WebsSocketCommand missing role_set",
-                        topic="Lobby",
-                    )
-                    logger.error(exc)
-                    raise exc
+        # S T A R T
+        if ws_command.action_type == WebSocketLobbyCommandTypeEnum.START:
+            if not ws_command.role_set:
+                exc = DomainException(
+                    "WebsSocketCommand missing role_set",
+                    topic="Lobby",
+                )
+                logger.error(exc)
+                raise exc
 
-                lobby = (
-                    await self._lobby_service._lobby_repository.get_lobby_by_id(
-                        ws_command.room_id
-                    )
-                )
+            lobby = await self._lobby_service._lobby_repository.get_lobby_by_id(
+                ws_command.room_id
+            )
 
-                if not lobby:
-                    exc = RoomNotFoundException(context_id=ws_command.room_id)
-                    logger.error(exc)
-                    raise exc
+            if not lobby:
+                exc = RoomNotFoundException(context_id=ws_command.room_id)
+                logger.error(exc)
+                raise exc
 
-                logger.debug("calling create game")
-                new_game = await self._game_service.create_game_from_lobby(
-                    lobby, ws_command.role_set
-                )
-                logger.debug("calling start game")
-                await self._game_manager.start_game(new_game)
+            logger.debug("calling create game")
+            new_game = await self._game_service.create_game_from_lobby(
+                lobby, ws_command.role_set
+            )
+            logger.debug("calling start game")
+            await self._game_manager.start_game(new_game)
 
-            # K I C K
-            elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.KICK:
-                if not ws_command.target_id:
-                    exc = DomainException(
-                        "WebSocket KICK command missing target_id",
-                        topic="Lobby",
-                    )
-                    logger.error(exc)
-                    raise exc
-                lobby_leave_command = LobbyLeaveCommand(
-                    lobby_id=ws_command.room_id,
-                    user_id=ws_command.target_id,
+        # K I C K
+        elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.KICK:
+            if not ws_command.target_id:
+                exc = DomainException(
+                    "WebSocket KICK command missing target_id",
+                    topic="Lobby",
                 )
-                await self._lobby_service.leave_lobby(lobby_leave_command)
-                await self._websocket_manager.disconnect(
-                    lobby_leave_command.lobby_id, lobby_leave_command.user_id
-                )
+                logger.error(exc)
+                raise exc
+            lobby_leave_command = LobbyLeaveCommand(
+                lobby_id=ws_command.room_id,
+                user_id=ws_command.target_id,
+            )
+            await self._lobby_service.leave_lobby(lobby_leave_command)
+            await self._websocket_manager.disconnect(
+                lobby_leave_command.lobby_id, lobby_leave_command.user_id
+            )
 
-            # D E L E T E
-            elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.DELETE:
-                lobby_leave_command = LobbyLeaveCommand(
-                    lobby_id=ws_command.room_id,
-                    user_id=current_user.id,
-                )
-                await self._lobby_service.leave_lobby(lobby_leave_command)
-                await self._websocket_manager.delete_all_connections(
-                    lobby_leave_command.lobby_id
-                )
+        # D E L E T E
+        elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.DELETE:
+            lobby_leave_command = LobbyLeaveCommand(
+                lobby_id=ws_command.room_id,
+                user_id=current_user.id,
+            )
+            await self._lobby_service.leave_lobby(lobby_leave_command)
+            await self._websocket_manager.delete_all_connections(
+                lobby_leave_command.lobby_id
+            )
 
-            # L E A V E
-            elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.LEAVE:
-                lobby_leave_command = LobbyLeaveCommand(
-                    lobby_id=ws_command.room_id,
-                    user_id=current_user.id,
-                )
-                await self._lobby_service.leave_lobby(lobby_leave_command)
-                await self._websocket_manager.disconnect(
-                    lobby_leave_command.lobby_id, lobby_leave_command.user_id
-                )
+        # L E A V E
+        elif ws_command.action_type == WebSocketLobbyCommandTypeEnum.LEAVE:
+            lobby_leave_command = LobbyLeaveCommand(
+                lobby_id=ws_command.room_id,
+                user_id=current_user.id,
+            )
+            await self._lobby_service.leave_lobby(lobby_leave_command)
+            await self._websocket_manager.disconnect(
+                lobby_leave_command.lobby_id, lobby_leave_command.user_id
+            )

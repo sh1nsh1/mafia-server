@@ -46,33 +46,6 @@ class GameStageEnum(StrEnum):
     NIGHT = "Night"
 
 
-class WebSocketMessageTypeEnum(StrEnum):
-    """WebSocket message type"""
-
-    COMMAND = "Command"
-
-    ERROR = "Error"  # WebSocketGameInfoPayload
-    INFO = "Info"  # WebSocketGameInfoPayload
-
-    EVENT = "Event"
-
-    NEW_STAGE = "NewStage"  # WebSocketGameNewStagePayload
-
-    GAME_DATA = "GameData"  # WebSocketGameGameDataPayload
-
-    LOBBY_DATA = "LobbyData"
-
-    ACTION_REQUEST = "ActionRequest"  # WebSocketGameActionRequestPayload
-
-    USER_CONNECT = "UserConnect"  # WebSocketUserConnectionMessagePayload
-    USER_LEAVE = "UserLeave"  # WebSocketUserConnectionMessagePayload
-
-    GAME_START = "GameStart"
-    GAME_FINISH = "GameFinish"
-
-    ROLE = "Role"
-
-
 class WebSocketGameCommandActionTypeEnum(StrEnum):
     VOTE = "Vote"
     ROLE_ACTION = "RoleAction"

@@ -1,21 +1,18 @@
-from typing import Any
+from typing import Any, Literal
 from datetime import datetime
 
 from pydantic import Field, BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-
-from domain.enums import WebSocketMessageTypeEnum
 
 
 class BaseMessage(BaseModel):
     """
     Базовый конверт WebSocket-сообщения.
 
-    Топик и payload задаются в наследниках
-    (GameMessage, LobbyMessage, SystemMessage).
+    Топик задаётся в наследниках, тип сообщения и payload — в конкретном
+    классе сообщения (см. incoming.py и outgoing.py).
     """
 
-    message_type: WebSocketMessageTypeEnum
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     payload: Any
 
@@ -27,3 +24,15 @@ class BaseMessage(BaseModel):
 
     def to_json(self) -> str:
         return self.model_dump_json(by_alias=True)
+
+
+class GameMessage(BaseMessage):
+    """Базовый класс сообщений с топиком Game"""
+
+    topic: Literal["Game"] = "Game"
+
+
+class LobbyMessage(BaseMessage):
+    """Базовый класс сообщений с топиком Lobby"""
+
+    topic: Literal["Lobby"] = "Lobby"

@@ -7,14 +7,11 @@ from fastapi.routing import APIRouter
 from starlette.websockets import WebSocketState
 from dishka.integrations.fastapi import inject
 
-from domain.enums import WebSocketMessageTypeEnum
 from domain.exceptions import DomainException
 from application.services import SecurityService, RoomWebSocketService
 from infrastructure.logger_config import get_logger
 from infrastructure.websocket.messages import (
-    GameMessage,
-    LobbyMessage,
-    SystemMessage,
+    ErrorMessage,
     WSGameInfoPayload,
     IncomingMessageAdapter,
 )
@@ -76,23 +73,12 @@ async def room_websocket(
                     f"Error on handling message: {ws_message.model_dump()}\n"
                     f"Error: {e.args}"
                 )
-                match e.topic:
-                    case "Lobby":
-                        error_message = LobbyMessage(
-                            message_type=WebSocketMessageTypeEnum.ERROR,
-                            payload=WSGameInfoPayload(text=e.message),
-                        )
-                    case "System":
-                        error_message = SystemMessage(
-                            message_type=WebSocketMessageTypeEnum.ERROR,
-                            payload=WSGameInfoPayload(text=e.message),
-                        )
-                    case _:
-                        error_message = GameMessage(
-                            message_type=WebSocketMessageTypeEnum.ERROR,
-                            payload=WSGameInfoPayload(text=e.message),
-                        )
-                await websocket.send_text(error_message.to_json())
+                await websocket.send_text(
+                    ErrorMessage(
+                        topic=e.topic,
+                        payload=WSGameInfoPayload(text=e.message),
+                    ).to_json()
+                )
 
     except WebSocketDisconnect:
         username = current_user.username if current_user else ""
