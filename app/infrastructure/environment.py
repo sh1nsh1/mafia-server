@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from pydantic_core import ErrorDetails
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from infrastructure.logger import get_logger
+from infrastructure.logger_config import get_logger
 
 
 class BaseEnv(BaseSettings):

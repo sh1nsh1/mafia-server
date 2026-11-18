@@ -3,7 +3,7 @@ from uuid import UUID
 from dishka import FromDishka
 from fastapi import UploadFile
 
-from infrastructure.logger import get_logger
+from infrastructure.logger_config import get_logger
 from infrastructure.database.repositories import AvatarRepository
 
 
