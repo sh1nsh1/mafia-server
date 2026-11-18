@@ -4,7 +4,7 @@ from infrastructure.websocket.messages.base_payload import (
 )
 
 
-class WSUserConnectionMessagePayload(BasePayload):
+class UserConnectionMessagePayload(BasePayload):
     text: str
     user: UserResponse
     lobby: LobbyResponse | None

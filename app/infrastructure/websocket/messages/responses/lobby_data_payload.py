@@ -6,7 +6,7 @@ from infrastructure.websocket.messages.base_payload import (
 from presentation.api.v1.dtos.responses.user_response import UserResponse
 
 
-class WSLobbyDataPayload(BasePayload):
+class LobbyDataPayload(BasePayload):
     id: str
     participants: list[UserResponse]
     admin_id: UUID

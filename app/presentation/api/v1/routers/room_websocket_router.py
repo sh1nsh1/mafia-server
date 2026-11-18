@@ -12,7 +12,7 @@ from application.services import SecurityService, RoomWebSocketService
 from infrastructure.logger_config import get_logger
 from infrastructure.websocket.messages import (
     ErrorMessage,
-    WSGameInfoPayload,
+    GameInfoPayload,
     IncomingMessageAdapter,
 )
 
@@ -76,7 +76,7 @@ async def room_websocket(
                 await websocket.send_text(
                     ErrorMessage(
                         topic=e.topic,
-                        payload=WSGameInfoPayload(text=e.message),
+                        payload=GameInfoPayload(text=e.message),
                     ).to_json()
                 )
 

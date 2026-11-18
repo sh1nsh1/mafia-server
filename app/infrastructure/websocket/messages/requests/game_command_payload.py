@@ -6,7 +6,7 @@ from infrastructure.websocket.messages.base_payload import (
 )
 
 
-class WSGameCommandPayload(BasePayload):
+class GameCommandPayload(BasePayload):
     action_type: WebSocketGameCommandActionTypeEnum
     actor_id: UUID
     target_id: UUID | None

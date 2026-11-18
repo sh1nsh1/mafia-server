@@ -4,6 +4,6 @@ from infrastructure.websocket.messages.base_payload import (
 )
 
 
-class WSGameNewStagePayload(BasePayload):
+class GameNewStagePayload(BasePayload):
     new_stage: GameStageEnum
     text: str

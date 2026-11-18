@@ -16,7 +16,7 @@ from infrastructure.websocket.messages import (
     GameCommandMessage,
     UserConnectMessage,
     LobbyCommandMessage,
-    WSUserConnectionMessagePayload,
+    UserConnectionMessagePayload,
 )
 from presentation.api.v1.dtos.requests import CurrentUser
 from presentation.api.v1.dtos.responses import UserResponse, LobbyResponse
@@ -55,7 +55,7 @@ class RoomWebSocketService:
         topic: WebSocketTopic = "Lobby" if lobby else "Game"
         message = UserConnectMessage(
             topic=topic,
-            payload=WSUserConnectionMessagePayload(
+            payload=UserConnectionMessagePayload(
                 text=f"User {current_user.username} подключился к комнате",
                 user=UserResponse(
                     id=current_user.id,
@@ -93,7 +93,7 @@ class RoomWebSocketService:
         topic: WebSocketTopic = "Lobby" if user_joined_room.is_lobby else "Game"
         message = UserLeaveMessage(
             topic=topic,
-            payload=WSUserConnectionMessagePayload(
+            payload=UserConnectionMessagePayload(
                 text=f"User {current_user.username} покинул комнату",
                 user=UserResponse(
                     id=current_user.id,

@@ -3,62 +3,62 @@ from typing import Literal
 from domain.enums import WebSocketTopic
 
 from .base_message import BaseMessage, GameMessage, LobbyMessage
-from .responses.ws_game_data_payload import WSGameDataPayload
-from .responses.ws_game_info_payload import WSGameInfoPayload
-from .responses.ws_game_role_payload import WSGameRolePayload
-from .responses.ws_lobby_data_payload import WSLobbyDataPayload
-from .responses.ws_game_new_stage_payload import WSGameNewStagePayload
-from .responses.ws_game_action_request_payload import (
-    WSGameActionRequestPayload,
+from .responses.game_data_payload import GameDataPayload
+from .responses.game_info_payload import GameInfoPayload
+from .responses.game_role_payload import GameRolePayload
+from .responses.lobby_data_payload import LobbyDataPayload
+from .responses.game_new_stage_payload import GameNewStagePayload
+from .responses.game_action_request_payload import (
+    GameActionRequestPayload,
 )
-from .responses.ws_user_connection_message_payload import (
-    WSUserConnectionMessagePayload,
+from .responses.user_connection_message_payload import (
+    UserConnectionMessagePayload,
 )
 
 
 class GameInfoMessage(GameMessage):
     message_type: Literal["Info"] = "Info"
-    payload: WSGameInfoPayload
+    payload: GameInfoPayload
 
 
 class GameEventMessage(GameMessage):
     message_type: Literal["Event"] = "Event"
-    payload: WSGameInfoPayload
+    payload: GameInfoPayload
 
 
 class GameStartMessage(GameMessage):
     message_type: Literal["GameStart"] = "GameStart"
-    payload: WSGameInfoPayload
+    payload: GameInfoPayload
 
 
 class GameFinishMessage(GameMessage):
     message_type: Literal["GameFinish"] = "GameFinish"
-    payload: WSGameInfoPayload
+    payload: GameInfoPayload
 
 
 class GameActionRequestMessage(GameMessage):
     message_type: Literal["ActionRequest"] = "ActionRequest"
-    payload: WSGameActionRequestPayload
+    payload: GameActionRequestPayload
 
 
 class GameRoleMessage(GameMessage):
     message_type: Literal["Role"] = "Role"
-    payload: WSGameRolePayload
+    payload: GameRolePayload
 
 
 class GameNewStageMessage(GameMessage):
     message_type: Literal["NewStage"] = "NewStage"
-    payload: WSGameNewStagePayload
+    payload: GameNewStagePayload
 
 
 class GameDataMessage(GameMessage):
     message_type: Literal["GameData"] = "GameData"
-    payload: WSGameDataPayload
+    payload: GameDataPayload
 
 
 class LobbyDataMessage(LobbyMessage):
     message_type: Literal["LobbyData"] = "LobbyData"
-    payload: WSLobbyDataPayload
+    payload: LobbyDataPayload
 
 
 class ErrorMessage(BaseMessage):
@@ -66,7 +66,7 @@ class ErrorMessage(BaseMessage):
 
     topic: WebSocketTopic
     message_type: Literal["Error"] = "Error"
-    payload: WSGameInfoPayload
+    payload: GameInfoPayload
 
 
 class UserConnectMessage(BaseMessage):
@@ -74,7 +74,7 @@ class UserConnectMessage(BaseMessage):
 
     topic: WebSocketTopic
     message_type: Literal["UserConnect"] = "UserConnect"
-    payload: WSUserConnectionMessagePayload
+    payload: UserConnectionMessagePayload
 
 
 class UserLeaveMessage(BaseMessage):
@@ -82,4 +82,4 @@ class UserLeaveMessage(BaseMessage):
 
     topic: WebSocketTopic
     message_type: Literal["UserLeave"] = "UserLeave"
-    payload: WSUserConnectionMessagePayload
+    payload: UserConnectionMessagePayload

@@ -10,7 +10,7 @@ from starlette.websockets import WebSocketDisconnect
 from domain.enums import WebSocketLobbyCommandTypeEnum
 from infrastructure.websocket.messages import (
     LobbyCommandMessage,
-    WSLobbyCommandPayload,
+    LobbyCommandPayload,
 )
 
 
@@ -55,7 +55,7 @@ def test_create_and_join_lobby(client: TestClient, redis_client, players):
         for i in range(len(sessions) - 1, -1, -1):
             sessions[i].send_text(
                 LobbyCommandMessage(
-                    payload=WSLobbyCommandPayload(
+                    payload=LobbyCommandPayload(
                         action_type=WebSocketLobbyCommandTypeEnum.LEAVE,
                         role_set=None,
                         room_id=lobby_id,

@@ -7,7 +7,7 @@ from infrastructure.websocket.messages.base_payload import (
 from presentation.api.v1.dtos.responses.player_response import PlayerResponse
 
 
-class WSGameDataPayload(BasePayload):
+class GameDataPayload(BasePayload):
     id: str
     players: list[PlayerResponse]
     admin: PlayerResponse

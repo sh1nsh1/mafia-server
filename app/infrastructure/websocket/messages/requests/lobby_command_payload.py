@@ -6,7 +6,7 @@ from infrastructure.websocket.messages.base_payload import (
 )
 
 
-class WSLobbyCommandPayload(BasePayload):
+class LobbyCommandPayload(BasePayload):
     action_type: WebSocketLobbyCommandTypeEnum
     target_id: UUID | None
     room_id: str

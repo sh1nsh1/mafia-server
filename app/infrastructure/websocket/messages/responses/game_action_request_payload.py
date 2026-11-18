@@ -3,6 +3,6 @@ from infrastructure.websocket.messages.base_payload import (
 )
 
 
-class WSGameActionRequestPayload(BasePayload):
+class GameActionRequestPayload(BasePayload):
     text: str
     timeout: int

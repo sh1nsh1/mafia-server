@@ -11,7 +11,7 @@ from infrastructure.websocket import WebSocketManager
 from infrastructure.logger_config import get_logger
 from infrastructure.websocket.messages import (
     ErrorMessage,
-    WSGameInfoPayload,
+    GameInfoPayload,
     GameCommandMessage,
 )
 from presentation.api.v1.dtos.requests import CurrentUser
@@ -64,7 +64,7 @@ class GameWSMessageHandler:
                 await self._websocket_manager.send_to_one(
                     ErrorMessage(
                         topic="Game",
-                        payload=WSGameInfoPayload(
+                        payload=GameInfoPayload(
                             text=e.message or "Неизвестная ошибка"
                         ),
                     ),
@@ -95,7 +95,7 @@ class GameWSMessageHandler:
                 await self._websocket_manager.send_to_one(
                     ErrorMessage(
                         topic="Game",
-                        payload=WSGameInfoPayload(
+                        payload=GameInfoPayload(
                             text=e.message or "Неизвестная ошибка"
                         ),
                     ),
