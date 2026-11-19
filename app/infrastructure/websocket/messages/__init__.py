@@ -18,7 +18,7 @@ from .outgoing import (
     GameNewStageMessage,
     GameActionRequestMessage,
 )
-from .base_message import BaseMessage, GameMessage, LobbyMessage
+from .base_message import BaseMessage
 from .message_type import MessageType
 from .payloads.game_data_payload import GameDataPayload
 from .payloads.game_info_payload import GameInfoPayload
@@ -42,7 +42,6 @@ __all__ = [
     "GameEventMessage",
     "GameFinishMessage",
     "GameInfoMessage",
-    "GameMessage",
     "GameNewStageMessage",
     "GameRoleMessage",
     "GameStartMessage",
@@ -50,7 +49,6 @@ __all__ = [
     "IncomingMessageAdapter",
     "LobbyCommandMessage",
     "LobbyDataMessage",
-    "LobbyMessage",
     "MessageType",
     "UserConnectMessage",
     "UserLeaveMessage",

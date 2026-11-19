@@ -4,6 +4,7 @@ from uuid import UUID
 import redis.asyncio as redis
 from dishka import FromDishka
 
+from domain.enums import Topic
 from domain.exceptions import (
     RepoException,
     LobbyIsFullException,
@@ -234,7 +235,7 @@ class LobbyRepository:
                     "Some actions in another sesstion",
                     context_id=lobby_id,
                     user_id=str(user_id),
-                    topic="Lobby",
+                    topic=Topic.LOBBY,
                 )
 
         new_lobby = await self.get_lobby_by_id(lobby_model.id)

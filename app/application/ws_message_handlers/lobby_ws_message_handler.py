@@ -1,6 +1,6 @@
 from dishka import FromDishka
 
-from domain.enums import WebSocketLobbyCommandTypeEnum
+from domain.enums import Topic, WebSocketLobbyCommandTypeEnum
 from domain.exceptions import DomainException, RoomNotFoundException
 from application.commands import LobbyLeaveCommand
 from application.services import GameService, GameManagerService
@@ -44,7 +44,7 @@ class LobbyWSMessageHandler:
             if not ws_command.role_set:
                 exc = DomainException(
                     "WebsSocketCommand missing role_set",
-                    topic="Lobby",
+                    topic=Topic.LOBBY,
                 )
                 logger.error(exc)
                 raise exc
@@ -70,7 +70,7 @@ class LobbyWSMessageHandler:
             if not ws_command.target_id:
                 exc = DomainException(
                     "WebSocket KICK command missing target_id",
-                    topic="Lobby",
+                    topic=Topic.LOBBY,
                 )
                 logger.error(exc)
                 raise exc

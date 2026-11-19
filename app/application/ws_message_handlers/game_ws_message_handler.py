@@ -1,6 +1,7 @@
 from dishka import FromDishka
 
 from domain.enums import (
+    Topic,
     GameStageEnum,
     WebSocketGameCommandActionTypeEnum,
 )
@@ -63,7 +64,7 @@ class GameWSMessageHandler:
                 )
                 await self._websocket_manager.send_to_one(
                     ErrorMessage(
-                        topic="Game",
+                        topic=Topic.GAME,
                         payload=GameInfoPayload(
                             text=e.message or "Неизвестная ошибка"
                         ),
@@ -94,7 +95,7 @@ class GameWSMessageHandler:
                 )
                 await self._websocket_manager.send_to_one(
                     ErrorMessage(
-                        topic="Game",
+                        topic=Topic.GAME,
                         payload=GameInfoPayload(
                             text=e.message or "Неизвестная ошибка"
                         ),

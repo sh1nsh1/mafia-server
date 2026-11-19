@@ -1,7 +1,7 @@
 from dishka import FromDishka
 from fastapi import WebSocket
 
-from domain.enums import WebSocketTopic
+from domain.enums import Topic
 from application.commands import LobbyJoinCommand
 from application.services import UserService, LobbyService
 from infrastructure.websocket import WebSocketManager
@@ -53,7 +53,7 @@ class RoomWebSocketService:
             LobbyJoinCommand(room_id, current_user.id)
         )
 
-        topic: WebSocketTopic = "Lobby" if lobby else "Game"
+        topic: Topic = Topic.LOBBY if lobby else Topic.GAME
 
         message = UserConnectMessage(
             topic=topic,
@@ -92,7 +92,7 @@ class RoomWebSocketService:
         #     )
         # )
 
-        topic: WebSocketTopic = "Lobby" if user_joined_room.is_lobby else "Game"
+        topic: Topic = Topic.LOBBY if user_joined_room.is_lobby else Topic.GAME
         message = UserLeaveMessage(
             topic=topic,
             payload=UserConnectionPayload(

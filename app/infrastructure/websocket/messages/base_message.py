@@ -1,4 +1,3 @@
-from typing import Literal
 from datetime import datetime
 
 from pydantic import Field, BaseModel, ConfigDict
@@ -10,7 +9,7 @@ class BaseMessage(BaseModel):
     Базовый конверт WebSocket-сообщения.
 
     Топик задаётся в наследниках, тип сообщения и payload — в конкретном
-    классе сообщения (см. incoming.py и outgoing.py).
+    классе сообщения.
     """
 
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
@@ -25,15 +24,3 @@ class BaseMessage(BaseModel):
         """Конвертация в JSON строку"""
 
         return self.model_dump_json(by_alias=True)
-
-
-class GameMessage(BaseMessage):
-    """Базовый класс сообщений с топиком Game"""
-
-    topic: Literal["Game"] = "Game"
-
-
-class LobbyMessage(BaseMessage):
-    """Базовый класс сообщений с топиком Lobby"""
-
-    topic: Literal["Lobby"] = "Lobby"

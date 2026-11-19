@@ -1,6 +1,6 @@
 from typing import Literal
 
-from domain.enums import WebSocketTopic
+from domain.enums import Topic
 
 
 class AppException(Exception):
@@ -18,13 +18,13 @@ class DomainException(AppException):
     Исключение доменной логики
     """
 
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
         message: str = "Произошла неизвестная ошибка",
         *,
-        topic: WebSocketTopic | None = None,
+        topic: Topic | None = None,
     ):
         if topic is not None:
             self.topic = topic
@@ -50,7 +50,7 @@ class RepoException(AppException):
     Исключение инфраструктурного слоя
     """
 
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -58,7 +58,7 @@ class RepoException(AppException):
         context_id: str | None = None,
         user_id: str | None = None,
         *,
-        topic: WebSocketTopic | None = None,
+        topic: Topic | None = None,
     ):
         if topic is not None:
             self.topic = topic
@@ -68,7 +68,7 @@ class RepoException(AppException):
 
 
 class UnexpectedWebSocketMessageActionType(DomainException):
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -82,7 +82,7 @@ class UnexpectedWebSocketMessageActionType(DomainException):
 
 
 class PlayerDisabledException(DomainException):
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -92,7 +92,7 @@ class PlayerDisabledException(DomainException):
 
 
 class VotedDisabledTargetException(DomainException):
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -102,7 +102,7 @@ class VotedDisabledTargetException(DomainException):
 
 
 class VotedUntargetableException(DomainException):
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -116,7 +116,7 @@ class VotedUntargetableException(DomainException):
 
 
 class PlayerChosenTwiceException(DomainException):
-    topic: WebSocketTopic = "Game"
+    topic: Topic = Topic.GAME
 
     def __init__(
         self,
@@ -130,7 +130,7 @@ class PlayerChosenTwiceException(DomainException):
 
 
 class RoomNotFoundException(DomainException):
-    topic: WebSocketTopic = "Lobby"
+    topic: Topic = Topic.LOBBY
 
     def __init__(
         self,
@@ -145,7 +145,7 @@ class RoomNotFoundException(DomainException):
 
 
 class UserAlredyInLobbyException(DomainException):
-    topic: WebSocketTopic = "Lobby"
+    topic: Topic = Topic.LOBBY
 
     def __init__(
         self,
@@ -160,7 +160,7 @@ class UserAlredyInLobbyException(DomainException):
 
 
 class ActionAlreadyPerformedException(RepoException):
-    topic: WebSocketTopic = "Lobby"
+    topic: Topic = Topic.LOBBY
 
     def __init__(
         self,
@@ -177,7 +177,7 @@ class ActionAlreadyPerformedException(RepoException):
 
 
 class LobbyIsFullException(DomainException):
-    topic: WebSocketTopic = "Lobby"
+    topic: Topic = Topic.LOBBY
 
     def __init__(
         self,
@@ -194,7 +194,7 @@ class LobbyIsFullException(DomainException):
 
 
 class UserNotInLobbyException(RepoException):
-    topic: WebSocketTopic = "Lobby"
+    topic: Topic = Topic.LOBBY
 
     def __init__(
         self,

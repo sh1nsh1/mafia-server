@@ -1,9 +1,12 @@
 from enum import StrEnum
-from typing import Literal
 
 
-WebSocketTopic = Literal["Game", "Lobby", "System"]
-"""Топик WebSocket-сообщения (лобби, игра, системные сообщения)"""
+class Topic(StrEnum):
+    """Топик WebSocket-сообщения (лобби, игра, системные сообщения)"""
+
+    GAME = "Game"
+    LOBBY = "Lobby"
+    SYSTEM = "System"
 
 
 class TeamEnum(StrEnum):
